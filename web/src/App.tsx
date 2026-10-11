@@ -43,7 +43,13 @@ export default function App() {
       const form = new FormData();
       form.append("file", datasetFile);
       const response = await fetch("/api/dataset/evaluate", { method: "POST", body: form });
-      const body = await response.json();
+      const text = await response.text();
+      let body: any;
+      try {
+        body = JSON.parse(text);
+      } catch {
+        throw new Error(response.status === 413 ? "File is too large for serverless upload (Vercel limit is 4.5 MB). Try a smaller CSV." : text || `Server error (${response.status})`);
+      }
       if (!response.ok) throw new Error(body.detail ?? "Dataset evaluation failed.");
       setDatasetResult(body);
       setIndex(0);
