@@ -38,6 +38,10 @@ export default function App() {
   async function evaluateDataset(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!datasetFile) { setDatasetError("Choose a CSV dataset."); return; }
+    if (datasetFile.size > 4.5 * 1024 * 1024) {
+      setDatasetError(`File is too large (${(datasetFile.size / (1024 * 1024)).toFixed(1)} MB). Vercel serverless limit is 4.5 MB. Please upload a smaller CSV file (like sample_hour.csv).`);
+      return;
+    }
     setDatasetBusy(true); setDatasetError(""); setPlaying(false);
     try {
       const form = new FormData();
@@ -87,8 +91,8 @@ export default function App() {
         <label htmlFor="hours">Simulation window <span>HOURLY</span></label><select id="hours" value={hours} onChange={event => setHours(Number(event.target.value))}><option value="48">48 hours</option><option value="72">72 hours</option><option value="120">120 hours</option><option value="240">240 hours</option></select>
         <button className="run-button" onClick={runScenario} disabled={busy} aria-busy={busy}>{busy ? <><span className="spinner" /> Running model…</> : <>Run twin scenario <span>↗</span></>}</button>
         <form className="twin-upload" onSubmit={evaluateDataset}>
-          <label htmlFor="bike-file">Real-data mode <span>CSV · MAX 500 MiB</span></label>
-          <input id="bike-file" type="file" accept=".csv" onChange={event => setDatasetFile(event.target.files?.[0] ?? null)} />
+          <label htmlFor="bike-file">Real-data mode <span>CSV · MAX 4.5 MB</span></label>
+          <input id="bike-file" type="file" accept=".csv" onChange={event => { setDatasetFile(event.target.files?.[0] ?? null); setDatasetError(""); }} />
           <p>Upload any CSV. The first complete numeric column is evaluated in file order with a trailing 30% holdout.</p>
           <button className="run-button upload-run" type="submit" disabled={datasetBusy || !datasetFile} aria-busy={datasetBusy}>{datasetBusy ? "Evaluating upload…" : "Evaluate uploaded data"}</button>
         </form>
