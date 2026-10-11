@@ -71,10 +71,15 @@ def load_csv_numeric_demand(path, max_rows=1_000_000):
                     columns[field].append(None)
                     continue
                 columns[field].append(value if np.isfinite(value) and value >= 0 else None)
-    for field, values in columns.items():
-        if values and all(value is not None for value in values):
+    valid_columns = {field: values for field, values in columns.items() if values and all(v is not None for v in values)}
+    if not valid_columns:
+        raise ValueError("CSV does not contain a complete finite, non-negative numeric column.")
+    skip_names = {"time", "timestamp", "datetime", "date", "id", "instant", "index", "row", "unnamed: 0", "step"}
+    for field, values in valid_columns.items():
+        if field.strip().lower() not in skip_names:
             return field, np.asarray(values, dtype=float)
-    raise ValueError("CSV does not contain a complete finite, non-negative numeric column.")
+    field, values = next(iter(valid_columns.items()))
+    return field, np.asarray(values, dtype=float)
 
 
 def make_features(series, lag=6):
