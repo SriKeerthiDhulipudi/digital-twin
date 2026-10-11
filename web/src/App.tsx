@@ -38,8 +38,8 @@ export default function App() {
   async function evaluateDataset(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!datasetFile) { setDatasetError("Choose a CSV dataset."); return; }
-    if (datasetFile.size > 50 * 1024 * 1024) {
-      setDatasetError(`File is too large (${(datasetFile.size / (1024 * 1024)).toFixed(1)} MB). Maximum supported file size is 50.0 MB.`);
+    if (datasetFile.size > 150 * 1024 * 1024) {
+      setDatasetError(`File is too large (${(datasetFile.size / (1024 * 1024)).toFixed(1)} MB). Maximum supported file size is 150.0 MB.`);
       return;
     }
     setDatasetBusy(true); setDatasetError(""); setPlaying(false);
@@ -100,7 +100,7 @@ export default function App() {
         <label htmlFor="hours">Simulation window <span>HOURLY</span></label><select id="hours" value={hours} onChange={event => setHours(Number(event.target.value))}><option value="48">48 hours</option><option value="72">72 hours</option><option value="120">120 hours</option><option value="240">240 hours</option></select>
         <button className="run-button" onClick={runScenario} disabled={busy} aria-busy={busy}>{busy ? <><span className="spinner" /> Running model…</> : <>Run twin scenario <span>↗</span></>}</button>
         <form className="twin-upload" onSubmit={evaluateDataset}>
-          <label htmlFor="bike-file">Real-data mode <span>CSV · MAX 50.0 MB</span></label>
+          <label htmlFor="bike-file">Real-data mode <span>CSV · MAX 100.0 MB+</span></label>
           <input id="bike-file" type="file" accept=".csv" onChange={event => { setDatasetFile(event.target.files?.[0] ?? null); setDatasetError(""); }} />
           <p>Upload any CSV. The first complete numeric column is evaluated in file order with a trailing 30% holdout.</p>
           <button className="run-button upload-run" type="submit" disabled={datasetBusy || !datasetFile} aria-busy={datasetBusy}>{datasetBusy ? "Evaluating upload…" : "Evaluate uploaded data"}</button>
