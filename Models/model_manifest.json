@@ -1,0 +1,29 @@
+{
+  "created_by": "workspace bootstrap",
+  "artifacts": [
+    "weights/",
+    "checkpoints/",
+    "README.md"
+  ],
+  "project": "project-10-digital-twin-enterprise",
+  "input_schema": "UCI Bike Sharing demand series with instant, dteday, hr, cnt columns",
+  "model_type": "Forecasting and digital-twin action optimizer",
+  "status": "trained",
+  "sample_upload_path": "Sample Upload/raw",
+  "notes": "Store model weights, checkpoints, and metadata in this folder.",
+  "last_run": {
+    "seed": 10,
+    "dataset": "UCI Bike Sharing hour.csv (sample_hour.csv)",
+    "checkpoint": "D:\\CSE FINAL\\project-10-digital-twin-enterprise\\Models\\checkpoints\\last_run_metrics.json",
+    "metrics": {
+      "data_source": "UCI Bike Sharing hour.csv (sample_hour.csv)",
+      "is_synthetic": false,
+      "test_hours": 8,
+      "forecast_mae": 6.3526143709178164,
+      "recommended_staffing_cost": 42.599999999999994,
+      "fixed_four_staff_cost": 119.80000000000001,
+      "decision_regret_vs_perfect_forecast": 0.0,
+      "mean_recommended_staff": 8.0
+    }
+  }
+}

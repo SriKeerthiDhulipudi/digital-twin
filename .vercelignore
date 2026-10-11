@@ -1,0 +1,6 @@
+cloudflared.exe
+__pycache__
+*.pyc
+.git
+web/node_modules
+web/dist

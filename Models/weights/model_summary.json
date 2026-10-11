@@ -1,0 +1,11 @@
+{
+  "project": "project-10-digital-twin-enterprise",
+  "model_type": "Forecasting and digital-twin action optimizer",
+  "status": "trained",
+  "dataset": "UCI Bike Sharing hour.csv (sample_hour.csv)",
+  "seed": 10,
+  "test_hours": 8,
+  "forecast_mae": 6.3526143709178164,
+  "decision_regret_vs_perfect_forecast": 0.0,
+  "checkpoint": "D:\\CSE FINAL\\project-10-digital-twin-enterprise\\Models\\checkpoints\\last_run_metrics.json"
+}

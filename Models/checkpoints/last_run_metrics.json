@@ -1,0 +1,18 @@
+{
+  "project": "project-10-digital-twin-enterprise",
+  "seed": 10,
+  "dataset": "UCI Bike Sharing hour.csv (sample_hour.csv)",
+  "test_hours": 8,
+  "forecast_mae": 6.3526143709178164,
+  "decision_regret_vs_perfect_forecast": 0.0,
+  "metrics": {
+    "data_source": "UCI Bike Sharing hour.csv (sample_hour.csv)",
+    "is_synthetic": false,
+    "test_hours": 8,
+    "forecast_mae": 6.3526143709178164,
+    "recommended_staffing_cost": 42.599999999999994,
+    "fixed_four_staff_cost": 119.80000000000001,
+    "decision_regret_vs_perfect_forecast": 0.0,
+    "mean_recommended_staff": 8.0
+  }
+}
