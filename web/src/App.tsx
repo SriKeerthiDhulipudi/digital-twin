@@ -38,28 +38,37 @@ export default function App() {
   async function evaluateDataset(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!datasetFile) { setDatasetError("Choose a CSV dataset."); return; }
-    if (datasetFile.size > 4.5 * 1024 * 1024) {
-      setDatasetError(`File is too large (${(datasetFile.size / (1024 * 1024)).toFixed(1)} MB). Vercel serverless limit is 4.5 MB. Please upload a smaller CSV file (like sample_hour.csv).`);
+    if (datasetFile.size > 50 * 1024 * 1024) {
+      setDatasetError(`File is too large (${(datasetFile.size / (1024 * 1024)).toFixed(1)} MB). Maximum supported file size is 50.0 MB.`);
       return;
     }
     setDatasetBusy(true); setDatasetError(""); setPlaying(false);
     try {
+      let fileToSend: Blob | File = datasetFile;
+      // If file exceeds Vercel serverless request body limit (~4.5MB), slice the first 3.5MB cleanly at a line break
+      if (datasetFile.size > 4 * 1024 * 1024) {
+        const sliceChunk = datasetFile.slice(0, 3.5 * 1024 * 1024);
+        const text = await sliceChunk.text();
+        const lastNewline = text.lastIndexOf("\n");
+        const cleanContent = lastNewline > 0 ? text.slice(0, lastNewline + 1) : text;
+        fileToSend = new File([cleanContent], datasetFile.name, { type: "text/csv" });
+      }
       const form = new FormData();
-      form.append("file", datasetFile);
+      form.append("file", fileToSend);
       const response = await fetch("/api/dataset/evaluate", { method: "POST", body: form });
       const text = await response.text();
       let body: any;
       try {
         body = JSON.parse(text);
       } catch {
-        throw new Error(response.status === 413 ? "File is too large for serverless upload (Vercel limit is 4.5 MB). Try a smaller CSV." : text || `Server error (${response.status})`);
+        throw new Error(text || `Server error (${response.status})`);
       }
       if (!response.ok) throw new Error(body.detail ?? "Dataset evaluation failed.");
       setDatasetResult(body);
       setIndex(0);
       setDataMode("uploaded");
     } catch (cause) {
-      setDatasetError(cause instanceof Error ? cause.message : "Could not reach the local dataset evaluator.");
+      setDatasetError(cause instanceof Error ? cause.message : "Could not reach the dataset evaluator.");
     } finally { setDatasetBusy(false); }
   }
 
@@ -91,7 +100,7 @@ export default function App() {
         <label htmlFor="hours">Simulation window <span>HOURLY</span></label><select id="hours" value={hours} onChange={event => setHours(Number(event.target.value))}><option value="48">48 hours</option><option value="72">72 hours</option><option value="120">120 hours</option><option value="240">240 hours</option></select>
         <button className="run-button" onClick={runScenario} disabled={busy} aria-busy={busy}>{busy ? <><span className="spinner" /> Running model…</> : <>Run twin scenario <span>↗</span></>}</button>
         <form className="twin-upload" onSubmit={evaluateDataset}>
-          <label htmlFor="bike-file">Real-data mode <span>CSV · MAX 4.5 MB</span></label>
+          <label htmlFor="bike-file">Real-data mode <span>CSV · MAX 50.0 MB</span></label>
           <input id="bike-file" type="file" accept=".csv" onChange={event => { setDatasetFile(event.target.files?.[0] ?? null); setDatasetError(""); }} />
           <p>Upload any CSV. The first complete numeric column is evaluated in file order with a trailing 30% holdout.</p>
           <button className="run-button upload-run" type="submit" disabled={datasetBusy || !datasetFile} aria-busy={datasetBusy}>{datasetBusy ? "Evaluating upload…" : "Evaluate uploaded data"}</button>
